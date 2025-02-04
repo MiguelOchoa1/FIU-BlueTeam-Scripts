@@ -23,8 +23,8 @@ function IsUnsigned($path) {
     }
 }
 # Function to calculate the entropy of a string
-function CalculateEntropy($input) {
-    $inputChars = $input.ToCharArray()
+function CalculateEntropy($inputString) {
+    $inputChars = $inputString.ToCharArray()
     $charCount = $inputChars.Length
     $charFrequency = @{}
     foreach ($char in $inputChars) {
