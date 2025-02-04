@@ -3,6 +3,8 @@
 # Created by: Juan Azcuna https://github.com/Dalosuuu
 # Date: 2025-02-05
 
+# Warning: Its required for the system to have systemd running to use this script, won't work with WSL.
+
 # Purpose: Check Linux services for potential security issues by analyzing:
 # - Services running as root
 # - Services with unusual file permissions
