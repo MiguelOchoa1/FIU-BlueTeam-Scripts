@@ -242,7 +242,7 @@ main() {
     }
 
     # Install dependencies
-    install_packages iptables ip6tables rsyslog
+    install_packages iptables rsyslog
 
     # User configuration
     get_hostname
