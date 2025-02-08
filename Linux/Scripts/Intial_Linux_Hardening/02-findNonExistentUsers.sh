@@ -7,7 +7,7 @@ USER_FILE="user_list.txt"
 valid_shells=(/bin/bash /bin/sh /usr/bin/zsh /usr/bin/fish)
 
 # Read predefined users from user_list.txt
-readarray -t predefined_users < $USER_FILE
+readarray -t predefined_users < "$USER_FILE"
 predefined_users+=("root")  # Explicitly keep root to ensure it's never processed
 
 # Function to handle unauthorized users
@@ -20,7 +20,7 @@ remove_unauthorized_users() {
             if [[ "$shell" == "$valid_shell" ]]; then
                 if ! printf '%s\n' "${predefined_users[@]}" | grep -qx "$username"; then
                     echo "User '$username' is NOT in the predefined list but has a valid shell: $shell"
-                    userdel -r $username || deluser $username --remove-home
+                    userdel -r "$username" 2>/dev/null || deluser "$username" --remove-home 2>/dev/null
                 fi
                 break
             fi
@@ -44,13 +44,13 @@ secure_home_directories() {
         if [ -f "$home/.bashrc" ]; then
             echo 'HISTFILE=/dev/null' >> "$home/.bashrc"
             echo 'unset HISTFILE' >> "$home/.bashrc"
-            sudo chattr +i "$home/.bashrc"
+            sudo chattr +i "$home/.bashrc" 2>/dev/null
         fi
 
         if [ -f "$home/.zshrc" ]; then
             echo 'HISTFILE=/dev/null' >> "$home/.zshrc"
             echo 'unset HISTFILE' >> "$home/.zshrc"
-            sudo chattr +i "$home/.zshrc"
+            sudo chattr +i "$home/.zshrc" 2>/dev/null
         fi
 
     done < /etc/passwd
@@ -58,10 +58,17 @@ secure_home_directories() {
 
 # Disabling chattr to prevent changes to critical system files
 secure_chattr() {
-    mv `which chattr` /usr/bin/shhh
+    chattr_path=$(which chattr 2>/dev/null)
+    if [ -n "$chattr_path" ]; then
+        sudo mv "$chattr_path" /usr/bin/shhh
+    else
+        echo "chattr command not found. Skipping this step."
+    fi
 }
 
 # Main script execution
 remove_unauthorized_users
 secure_home_directories
 secure_chattr
+
+echo "Script execution completed."
