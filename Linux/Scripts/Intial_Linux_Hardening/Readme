@@ -1,0 +1,234 @@
+To harden a Linux server using the provided scripts and best practices, follow this step-by-step guide:
+1. Initial Setup and Updates
+Run the following to update packages and install essential hardening utilities:
+
+sudo ./01-setupInstallHarden.sh
+
+Function: This script will update the package manager, install essential security utilities, and set initial security configurations.
+
+✔️ Additional Steps:
+
+    Disable unused services using: sudo systemctl disable <service-name>.
+    Update the kernel and install security updates:
+
+    sudo apt-get update && sudo apt-get upgrade -y
+    sudo apt-get dist-upgrade -y
+
+2. Audit and Secure Users
+Check and ensure the user accounts are valid:
+
+    Script: 02-findNonExistentUsers.sh
+
+    sudo ./02-findNonExistentUsers.sh
+
+    Function: Identify users with invalid home directories, non-existent shells, or no activity.
+
+✔️ Additional Steps:
+
+    Manually verify non-existent or suspicious users using:
+
+cat /etc/passwd | grep '/nologin'
+
+Remove unnecessary users:
+
+    sudo ./ensureCorrectUsers.sh
+
+3. Rotate SSH Keys and Passwords
+Secure SSH and user passwords:
+
+    Script: 03-passwordAndSSHRotate.sh
+
+    sudo ./03-passwordAndSSHRotate.sh
+
+    Function: Automates the process of rotating passwords and updating SSH keys.
+
+✔️ Ensure these settings in /etc/ssh/sshd_config:
+
+    Disable root login:
+
+PermitRootLogin no
+
+Disable password-based login if possible:
+
+PasswordAuthentication no
+
+Restart SSH:
+
+    sudo systemctl restart sshd
+
+4. Secure Services with Systemd
+Manage and audit active services:
+
+    Script: 04-systemdServices.sh
+
+    sudo ./04-systemdServices.sh
+
+    Function: Lists active services and identifies any unnecessary services to be disabled or masked.
+
+✔️ Manually disable unnecessary services:
+
+sudo systemctl disable <service-name>
+sudo systemctl mask <service-name>
+
+5. Fix SUID Vulnerabilities
+Find and remove unnecessary SUID binaries:
+
+    Script: 05-suid.sh
+
+    sudo ./05-suid.sh
+
+    Function: Scans for binaries with SUID permissions that could be exploited and prompts for mitigation.
+
+✔️ Recommended Actions:
+
+    Remove SUID from unnecessary binaries:
+
+    sudo chmod -s <file>
+
+6. Manage and Remove Unnecessary Crontabs
+Delete unnecessary or malicious crontab jobs:
+
+    Script: 06-eraseAllUserCrontabs.sh
+
+    sudo ./06-eraseAllUserCrontabs.sh
+
+    Function: Automatically wipes user-specific crontabs that may contain malicious jobs.
+
+✔️ Review system-wide crontabs manually:
+
+sudo crontab -u <user> -l
+
+7. Secure SSH Configuration
+
+    Script: 07-ssh.sh
+
+    sudo ./07-ssh.sh
+
+    Function: This audits and applies secure SSH configurations.
+
+✔️ Manual Config Recommendations:
+
+    Limit SSH to specific users:
+
+AllowUsers <username>
+
+Enable key-based authentication:
+
+    PasswordAuthentication no
+
+8. Monitor Suspicious Processes
+
+    Script: 08-pspy.sh
+
+    sudo ./08-pspy.sh
+
+    Function: Uses pspy to detect any hidden or unusual processes running on the server.
+
+✔️ Review and kill unnecessary processes:
+
+sudo kill -9 <pid>
+
+9. Enable Command Logging
+
+    Script: 09-snoopy.sh
+
+    sudo ./09-snoopy.sh
+
+    Function: Installs Snoopy Logger to log every command run on the system.
+
+✔️ Verify Installation:
+
+sudo snoopy-status
+
+10. Apply Nix Armor Security Hardening
+
+    Script: 10-runWaseemNixArmorFork.sh
+
+    sudo ./10-runWaseemNixArmorFork.sh
+
+    Function: This runs a customized hardening script to apply multiple security configurations.
+
+✔️ Cross-check hardening with security benchmarks like CIS or OpenSCAP.
+11. Enumerate Persistent Threats
+
+    Script: 11-enumeratePersistence.sh
+
+    sudo ./11-enumeratePersistence.sh
+
+    Function: Detects backdoors, persistent services, and unauthorized access points.
+
+✔️ Verify startup services and persistent cron jobs manually:
+
+sudo systemctl list-unit-files --state=enabled
+
+12. Collect and Archive System Context
+
+    Script: 12-context.sh
+
+    sudo ./12-context.sh
+
+    Function: Collects and archives system metadata, user details, and key configurations.
+
+✔️ Recommended for backups before hardening:
+
+    Use the createbackup.sh script to back up important configurations:
+
+    sudo ./linux-utility/createbackup.sh
+
+13. Enable IP Banning
+
+    Script: linux-utility/ipban.sh
+
+    sudo ./linux-utility/ipban.sh
+
+    Function: Implements IP banning for suspicious activities.
+
+✔️ Consider configuring fail2ban:
+
+sudo apt-get install fail2ban
+
+14. Secure the MySQL Database
+
+    Script: linux-utility/mysqlBackup.sh & linux-utility/changesqlpass.sh
+
+    sudo ./linux-utility/mysqlBackup.sh
+    sudo ./linux-utility/changesqlpass.sh
+
+    Function: Backs up and changes MySQL passwords.
+
+✔️ Ensure the following settings in MySQL:
+
+    Disable remote access unless necessary:
+
+    UPDATE mysql.user SET Host='localhost' WHERE User='root';
+    FLUSH PRIVILEGES;
+
+15. File Integrity Monitoring
+
+    Script: linux-utility/createhashes.sh
+
+    sudo ./linux-utility/createhashes.sh
+
+    Function: Generates file hashes to detect tampering.
+
+✔️ Cross-check with Tripwire or AIDE:
+
+sudo apt-get install tripwire
+sudo tripwire --init
+
+Final Review
+
+    Check for any remaining suspicious processes:
+
+ps aux | grep root
+
+Reboot the server:
+
+sudo reboot
+
+Perform a vulnerability scan using Lynis or OpenVAS:
+
+    sudo apt-get install lynis
+    sudo lynis audit system
+
+By following this structured approach using the scripts provided, you can achieve comprehensive Linux server hardening while mitigating potential attack vectors.
