@@ -112,6 +112,6 @@ echo "UFW has been configured and re-enabled."
 
 sudo ufw status verbose
 
-./linux-utility/createshashes.sh
+./linux-utility/createhashes.sh
 
 echo "********* DONE ************"
