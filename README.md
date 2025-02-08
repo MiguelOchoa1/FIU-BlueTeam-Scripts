@@ -1,5 +1,3 @@
 # FIU-BlueTeam-Scripts
 nesseus installation link:
-[curl --request GET \
-  --url 'https://www.tenable.com/downloads/api/v2/pages/nessus/files/Nessus-10.8.3-x64.msi' \
-  --output 'Nessus-10.8.3-x64.msi'](https://www.tenable.com/downloads/nessus?utm_source=nessus-trial-thank-you-update&loginAttempted=true)
+(https://www.tenable.com/downloads/nessus?loginAttempted=true&mkt_tok=OTM0LVhRQi01NjgAAAGYhHiC3F3japIhvOgYrpSY5sxRSJ9LNbFVvnTw9S8oA4Sl5ssoDc4NGNU3VfRHEP8JfPCHLNkeGsUigOwc12RXR5zOGCFpZQP8eTNgJi75T6hrtA)
